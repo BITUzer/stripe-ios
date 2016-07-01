@@ -222,6 +222,13 @@
     if (![STPCardValidator stringIsNumeric:string]) {
         return NO;
     }
+    // Some custom keyboards don't call deleteBackward if the field is empty,
+    // and instead call insertText with an empty string.
+    BOOL deletingEmpty = (range.location == 0 && range.length == 0 && [string isEqualToString:@""]);
+    if (deletingEmpty) {
+        [textField deleteBackward];
+        return NO;
+    }
     NSString *destination = [[textField.text stringByReplacingCharactersInRange:range withString:string] stp_safeSubstringToIndex:1];
     textField.text = destination;
     UITextField *nextField = [self fieldAfter:textField];
